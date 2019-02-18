@@ -29,9 +29,10 @@ object ChiselAnnotation {
     }
 }
 
-/** Mixin for [[ChiselAnnotation]] that instantiates an associated FIRRTL Transform when this
-  * Annotation is present during a run of [[chisel3.Driver.execute]]. Automatic Transform
-  * instantiation is *not* supported when the Circuit and Annotations are serialized before invoking
+/** Mixin for [[ChiselAnnotation]] that instantiates an associated FIRRTL Transform when this Annotation is present
+  * during a run of
+  * [[Driver$.execute(args:Array[String],dut:()=>chisel3\.experimental\.RawModule)* Driver.execute]].
+  * Automatic Transform instantiation is *not* supported when the Circuit and Annotations are serialized before invoking
   * FIRRTL.
   */
 // TODO There should be a FIRRTL API for this instead
@@ -87,4 +88,3 @@ object dontTouch { // scalastyle:ignore object.name
     data
   }
 }
-
