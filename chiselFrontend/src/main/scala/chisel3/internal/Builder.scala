@@ -251,10 +251,12 @@ private[chisel3] object Builder {
   // TODO(twigg): Ideally, binding checks and new bindings would all occur here
   // However, rest of frontend can't support this yet.
   def pushCommand[T <: Command](c: T): T = {
+    println(s"pushCommand($c)")
     forcedUserModule.addCommand(c)
     c
   }
   def pushOp[T <: Data](cmd: DefPrim[T]): T = {
+    println(s"pushOp($cmd)")
     // Bind each element of the returned Data to being a Op
     cmd.id.bind(OpBinding(forcedUserModule))
     pushCommand(cmd).id
