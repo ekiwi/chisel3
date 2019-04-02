@@ -5,7 +5,34 @@ package examples
 import chiselTests.ChiselFlatSpec
 import chisel3.testers.BasicTester
 import chisel3._
+import chisel3.core.{Bool, CompileOptions, WhenContext}
+import chisel3.internal.sourceinfo.SourceInfo
 import chisel3.util._
+
+
+object spec {  // scalastyle:ignore object.name
+  def apply(block: => Unit)(implicit sourceInfo: SourceInfo,
+                            compileOptions: CompileOptions): SpecContext = {
+    new SpecContext(sourceInfo, block)
+  }
+}
+
+final class SpecContext(sourceInfo: SourceInfo, block: => Unit, firrtlDepth: Int = 0) {
+  println("spec {")
+
+  block
+
+  println("}")
+
+  def impl(block: => Unit)(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): Unit = {
+    println("impl {")
+
+    block
+
+    println("}")
+  }
+}
+
 
 
 abstract class TestClass extends Module {
@@ -19,14 +46,35 @@ abstract class TestClass extends Module {
 }
 
 class A extends  TestClass {
+  io.c := 0.U
   io.status := 0.U
+
+
+  spec {
+    switch(io.ctrl) {
+      is(0.U) {
+        io.c := io.a + io.b
+      }
+      is(1.U) {
+        io.c := io.a - io.b
+      }
+    }
+  } .impl {
+    val is_add = io.ctrl === 0.U
+    val is_sub = io.ctrl === 1.U
+    val b = Mux(is_sub, ~io.b, io.b)
+    when(is_add || is_sub) {
+      io.c := io.a + b
+    }
+  }
 
 }
 
-// Accept a reference to a SimpleVendingMachine so it can be constructed inside
-// the tester (in a call to Module.apply as required by Chisel
 class AnonymousModuleTester(mod: => TestClass) extends BasicTester {
   val dut = Module(mod)
+  dut.io.a := 0.U
+  dut.io.b := 0.U
+  dut.io.ctrl := 0.U
 }
 
 class AnonymousModuleSpec extends ChiselFlatSpec {
