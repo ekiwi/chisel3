@@ -20,14 +20,18 @@ object spec {  // scalastyle:ignore object.name
 final class SpecContext(sourceInfo: SourceInfo, block: => Unit, firrtlDepth: Int = 0) {
   println("spec {")
 
-  block
+  when(false.B) {
+    block
+  }
 
   println("}")
 
   def impl(block: => Unit)(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): Unit = {
     println("impl {")
 
-    block
+    when(true.B) {
+      block
+    }
 
     println("}")
   }
